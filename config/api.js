@@ -53,7 +53,7 @@ router.get('/data', (req, res) => {
 })
 //登录
 router.post('/login', (req, res) => {
-    conn.query(`select * from userinfo where phoneNumber=${req.body.zhanghao}`,
+    conn.query(`select * from userinfo where phoneNumber=${req.body.phoneNumber}`,
         function (err, result) {
             if (result.length === 0) {
                 jsonWrite(res, {
