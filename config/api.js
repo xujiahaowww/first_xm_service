@@ -22,7 +22,7 @@ var jsonWrite = function (res, ret) {
             msg: '操作失败'
         });
     } else {
-        console.log('ret', ret)
+        console.log('ret11', ret)
         res.json(ret);
     }
 };
