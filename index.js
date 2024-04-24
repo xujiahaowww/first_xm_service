@@ -2,6 +2,7 @@ let express = require('express') // 引入express
 let app = express() // 相当于 http.createServer(app)
 const cors = require('cors')
 let bodyParser = require('body-parser')
+app.use(bodyParser.json());
 //----- 配置跨域 -----
 
 app.use(cors())
@@ -15,9 +16,8 @@ app.all("*", (req, res, next) => {
     next();
 });
 
-app.use(bodyParser.json());
-
 app.use('/api', require('./config/api'))
+// app.use('/chat', require('./config/chat'))
 // 监听3000端口
 app.listen(3007, () => {
     console.log(`Server running at 3007`)
