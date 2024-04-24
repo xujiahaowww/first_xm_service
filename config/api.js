@@ -93,7 +93,6 @@ router.use(express.static("./public"))
 
 router.post("/upload", (req, res) => {
     let oldName = req.files[0].path;//获取名字
-    console.log(oldName,'oldName')
     //给新名字加上原来的后缀
     let newName = req.files[0].path + path.parse(req.files[0].originalname).ext;
     fs.renameSync(oldName, newName);//改图片的名字
