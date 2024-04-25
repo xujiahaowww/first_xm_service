@@ -81,6 +81,27 @@ router.post('/login', (req, res) => {
             }
         })
 })
+//登录
+router.post('/changeuserinfo', (req, res) => {
+    console.log(req.body,'req.bodyreq.body')
+    conn.query(`update userinfo set phoneNumber='${req.body.phoneNumber}', password='${req.body.password}', name='${req.body.name}', sex='${req.body.sex}' where userID=${req.body.userID}`,
+        function (err, result) {
+            if (result) {
+                jsonWrite(res, {
+                    code: 2001,
+                    info: "修改成功",
+                });
+            } else {
+                jsonWrite(res, {
+                    code: 4001,
+                    info: "修改失败"
+                })
+            }
+            if (err) {
+                console.log(err);
+            }
+        })
+})
 
 
 let objMulter = multer({ dest: "./public/upload" });
@@ -88,9 +109,8 @@ let objMulter = multer({ dest: "./public/upload" });
 router.use(objMulter.any())//any表示任意类型的文件
 // app.use(objMulter.image())//仅允许上传图片类型
 router.use(express.static("./public"))
-
+ 
 // const upload = multer({ storage: storage })
-
 router.post("/upload", (req, res) => {
     let oldName = req.files[0].path;//获取名字
     //给新名字加上原来的后缀
