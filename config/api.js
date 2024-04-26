@@ -27,33 +27,21 @@ var jsonWrite = function (res, ret) {
     }
 };
 // 下面是api路由的代码
-
 //验证码
-var captcha = svgCaptcha.create({
-    size: 4,
-    fontSize: 50,
-    width: 100,
-    height: 43,
-    bacground: '#cc9966',
-});
-
 router.get('/verif', (req, res) => {
     // res.type('svg'); // 响应的类型
+    var captcha = svgCaptcha.create({
+        size: 4,
+        fontSize: 50,
+        width: 100,
+        height: 43,
+        bacground: '#cc9966',
+    });
     res.send(captcha);
 });
-router.get('/data', (req, res) => {
-    conn.query("select * from cakeimgtable", function (err, result) {
-        if (err) {
-            console.log(err);
-        }
-        if (result) {
-            jsonWrite(res, result);
-        }
-    })
-})
 //登录
 router.post('/login', (req, res) => {
-    conn.query(`select * from userinfo where phoneNumber=${req.body.phoneNumber}`,
+    conn.query(`select * from userinfo where phoneNumber='${req.body.phoneNumber}'`,
         function (err, result) {
             if (result.length === 0) {
                 jsonWrite(res, {
@@ -81,9 +69,41 @@ router.post('/login', (req, res) => {
             }
         })
 })
-//登录
+//注册
+router.post('/registered', (req, res) => {
+    conn.query(`select * from userinfo where phoneNumber=${req.body.phoneNumber}`,
+        function (err, result) {
+            console.log(result, 'resultresultresult')
+            if (result) {
+                jsonWrite(res, {
+                    code: 4003,
+                    info: "该账号已注册"
+                })
+            } else {
+                console.log(req.body, 'req.bodyreq.bodyreq.body')
+                conn.query(`insert into userinfo(userID,name,phoneNumber,sex,password,imgsrc) values ('${req.body.userID}', '${req.body.name}', '${req.body.phoneNumber}','${req.body.sex}','${req.body.password}','${req.body.imgsrc}')`,
+                    function (err, result) {
+                        if (result) {
+                            jsonWrite(res, {
+                                code: 2001,
+                                info: "账号注册成功"
+                            })
+                        } else {
+                            jsonWrite(res, {
+                                code: 4001,
+                                info: "账号注册失败"
+                            })
+                        }
+                    }
+                )
+            }
+            if (err) {
+                console.log(err);
+            }
+        })
+})
+//修改个人信息
 router.post('/changeuserinfo', (req, res) => {
-    console.log(req.body,'req.bodyreq.body')
     conn.query(`update userinfo set phoneNumber='${req.body.phoneNumber}', password='${req.body.password}', name='${req.body.name}', sex='${req.body.sex}' where userID=${req.body.userID}`,
         function (err, result) {
             if (result) {
@@ -109,7 +129,7 @@ let objMulter = multer({ dest: "./public/upload" });
 router.use(objMulter.any())//any表示任意类型的文件
 // app.use(objMulter.image())//仅允许上传图片类型
 router.use(express.static("./public"))
- 
+
 // const upload = multer({ storage: storage })
 router.post("/upload", (req, res) => {
     let oldName = req.files[0].path;//获取名字
@@ -125,5 +145,39 @@ router.post("/upload", (req, res) => {
     });
 })
 
+
+async function deleteFile(url) {
+    const filePath = url.split('/').slice(-1)[0];
+    console.log(filePath, 'filePathfilePath')
+    let res
+    await fs.unlink(`./public/upload/${filePath}`,
+        removeErr => {
+            if (removeErr) {
+                console.error(`删除文件出错: ${filePath}`, removeErr);
+                res = false
+            } else {
+                console.log(`文件删除成功: ${filePath}`);
+                res = true
+            }
+        })
+    return res
+}
+//删除上传的图片
+router.post('/deleUploadingimg', (req, res) => {
+    console.log(req.body, 'req.bodyreq.body')
+    let results = deleteFile(req.body.url)
+    if (results) {
+        jsonWrite(res, {
+            code: 2001,
+            info: "删除成功",
+        })
+    } else {
+        jsonWrite(res, {
+            code: 4001,
+            info: "修改失败",
+        })
+    }
+
+})
 // 导出路由对象
 module.exports = router;
