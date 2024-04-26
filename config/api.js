@@ -73,14 +73,12 @@ router.post('/login', (req, res) => {
 router.post('/registered', (req, res) => {
     conn.query(`select * from userinfo where phoneNumber=${req.body.phoneNumber}`,
         function (err, result) {
-            console.log(result, 'resultresultresult')
             if (result) {
                 jsonWrite(res, {
                     code: 4003,
                     info: "该账号已注册"
                 })
             } else {
-                console.log(req.body, 'req.bodyreq.bodyreq.body')
                 conn.query(`insert into userinfo(userID,name,phoneNumber,sex,password,imgsrc) values ('${req.body.userID}', '${req.body.name}', '${req.body.phoneNumber}','${req.body.sex}','${req.body.password}','${req.body.imgsrc}')`,
                     function (err, result) {
                         if (result) {
@@ -177,7 +175,6 @@ router.post('/deleUploadingimg', (req, res) => {
             info: "修改失败",
         })
     }
-
 })
 // 导出路由对象
 module.exports = router;

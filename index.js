@@ -17,6 +17,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use('/api', require('./config/api'))
+app.use('/wpapi', require('./config/wpapi'))
 // app.use('/chat', require('./config/chat'))
 // 监听3000端口
 app.listen(3007, () => {
