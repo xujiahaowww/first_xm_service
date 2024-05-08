@@ -28,7 +28,13 @@ var jsonWrite = function (res, ret) {
 // 下面是api路由的代码
 //查询全部
 router.post('/loadproduct', (req, res) => {
-    let sizebigin = (req.body.page - 1) * req.body.size + 5
+    let sizebigin
+    if (req.body.type === 'lunbo') {
+        sizebigin = 0
+    } else {
+        sizebigin = (req.body.page - 1) * req.body.size + 5
+    }
+
     conn.query(`select * from producttable LIMIT ${req.body.size} OFFSET ${sizebigin}`,
         function (err, result) {
             if (!result) {
@@ -50,6 +56,28 @@ router.post('/loadproduct', (req, res) => {
         })
 })
 
+// 查询详情
+router.post('/detail', (req, res) => {
+    conn.query(`select * from foodimgtable where foodID =  ${req.body.id} `,
+        function (err, result) {
+            if (!result) {
+                jsonWrite(res, {
+                    code: 4001,
+                    info: "未查询到商品详情信息"
+                })
+            } else {
+                jsonWrite(res, {
+                    code: 2001,
+                    info: "查询成功",
+                    productData: result
+                });
+
+            }
+            if (err) {
+                console.log(err);
+            }
+        })
+})
 
 
 let objMulter = multer({ dest: "./public/upload" });
